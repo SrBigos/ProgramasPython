@@ -58,6 +58,23 @@ def insertar():
     borrado()
     preguntado()
 
+def eliminar():
+    borrado()
+    print("----------------------------------")
+    print("ＥＬＩＭＩＮＡＲ  ＪＵＧＡＤＯＲ")
+    print("----------------------------------")
+    print("")
+    nombre = input("・Nombre del jugador: ")
+
+    sql = "DELETE FROM jugadores WHERE (Nombre = %s)"
+    vader.execute(sql, nombre)
+    nba.commit()
+    print("")
+    print("Se ha borrado correctamente al jugador")
+    time.sleep(5)
+    borrado()
+    preguntado()
+
 def error():
     borrado()
     preguntado()
@@ -68,6 +85,7 @@ def salir():
 def preguntas(): 
     preguntas = {
 	    '1': insertar,
+        '2': eliminar,
         'X': salir,
         'x': salir
     }
