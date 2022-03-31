@@ -66,8 +66,9 @@ def eliminar():
     print("")
     nombre = input("・Nombre del jugador: ")
 
-    sql = "DELETE FROM jugadores WHERE (Nombre = %s)"
-    vader.execute(sql, nombre)
+    sql = "DELETE FROM jugadores WHERE Nombre LIKE %s"
+    val = (nombre, )
+    vader.execute(sql, val)
     nba.commit()
     print("")
     print("Se ha borrado correctamente al jugador")
