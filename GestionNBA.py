@@ -2,7 +2,6 @@ import mysql.connector
 import os
 import time
 
-
 nba = mysql.connector.connect(
     host="localhost",
     user="root",
@@ -17,19 +16,30 @@ def borrado():
 
 def preguntado():
     global pregunta
-    print("----------------------------------------------------")
-    print("ＭＡＮＴＥＮＩＭＩＥＮＴＯ  ＤＥ  ＪＵＧＡＤＯＲＥＳ")
-    print("----------------------------------------------------")
+    print("--------------------------")
+    print("MANTENIMIENTO DE JUGADORES")
+    print("--------------------------")
     print("")
-    print("・1. Insertar jugador")
-    print("・2. Eliminar jugador")
-    print("・3. Modificar jugador")
-    print("・4. Datos del jugador")
-    print("・5. Listar la tabla")
-    print("・X. Salir")
+    print("· 1. Insertar jugador")
+    print("· 2. Eliminar jugador")
+    print("· 3. Modificar jugador")
+    print("· 4. Datos del jugador")
+    print("· 5. Listar la tabla")
+    print("· X. Salir")
     print("")
     pregunta = input("Elija opción: ")
     preguntas()
+
+def askpeso():
+    global peso
+    try:
+        peso = int(input("· Peso del jugador: "))
+    except:
+        print("")
+        print("El peso tiene que ser un valor numérico")
+        print("")
+        askpeso()
+
 
 def insertar():
     borrado()
@@ -37,16 +47,17 @@ def insertar():
     codigo_sql = vader.fetchone()
     for x in codigo_sql:
         codigo = int(x+1)
-    print("----------------------------------")
-    print("ＩＮＳＥＲＴＡＲ  ＪＵＧＡＤＯＲ")
-    print("----------------------------------")
+    print("----------------")
+    print("INSERTAR JUGADOR")
+    print("----------------")
     print("")
-    nombre = input("・Nombre del jugador: ")
-    procedencia = input("・Procedencia del jugador: ")
-    altura = input("・Altura del jugador: ")
-    peso = input("・Peso del jugador: ")
-    posicion = input("・Posicion del jugador: ")
-    equipo = input("・Equipo del jugador: ")
+    
+    nombre = input("· Nombre del jugador: ")
+    procedencia = input("· Procedencia del jugador: ")
+    altura = input("· Altura del jugador: ")
+    askpeso()
+    posicion = input("· Posicion del jugador: ")
+    equipo = input("· Equipo del jugador: ")
 
     sql = "INSERT INTO jugadores VALUES (%s, %s, %s, %s, %s, %s, %s)"
     val = codigo, nombre, procedencia, altura, peso, posicion, equipo
@@ -54,17 +65,17 @@ def insertar():
     nba.commit()
     print("")
     print("Se ha agregado correctamente al jugador")
-    time.sleep(5)
+    time.sleep(3)
     borrado()
     preguntado()
 
 def eliminar():
     borrado()
-    print("----------------------------------")
-    print("ＥＬＩＭＩＮＡＲ  ＪＵＧＡＤＯＲ")
-    print("----------------------------------")
+    print("----------------")
+    print("ELIMINAR JUGADOR")
+    print("----------------")
     print("")
-    nombre = input("・Nombre del jugador: ")
+    nombre = input("· Nombre del jugador: ")
 
     sql = "DELETE FROM jugadores WHERE Nombre LIKE %s"
     val = (nombre, )
@@ -72,7 +83,43 @@ def eliminar():
     nba.commit()
     print("")
     print("Se ha borrado correctamente al jugador")
-    time.sleep(5)
+    time.sleep(3)
+    borrado()
+    preguntado()
+
+def modificar():
+    borrado()
+    print("-----------------")
+    print("MODIFICAR JUGADOR")
+    print("-----------------")
+    print("")
+    oldnombre = input("· Indícame el nombre del jugador que deseas modificar: ")
+    print("")
+    vader.execute(f"SELECT codigo FROM jugadores WHERE Nombre LIKE '{oldnombre}'")
+    codigo_sql = vader.fetchone()
+    for x in codigo_sql:
+        codigo = x
+    print(codigo)
+    nombre = input("· Nombre del jugador: ")
+    procedencia = input("· Procedencia del jugador: ")
+    altura = input("· Altura del jugador: ")
+    askpeso()
+    posicion = input("· Posicion del jugador: ")
+    equipo = input("· Equipo del jugador: ")
+
+    try:
+        sql = "UPDATE jugadores SET Nombre = %s, Procedencia = %s, Altura = %s, Peso = %s, Posicion = %s, Nombre_equipo = %s WHERE Nombre LIKE %s OR codigo = %s"
+        val = (nombre, procedencia, altura, peso, posicion, equipo, oldnombre, codigo)
+        vader.execute(sql, val)
+        nba.commit()
+        print("")
+        print("Se ha editado correctamente al jugador")
+    except mysql.connector.IntegrityError as e:
+        print("Error: {}".format(e))
+        return {"message": e}
+        time.sleep(3)
+        modificar()
+    time.sleep(3)
     borrado()
     preguntado()
 
@@ -87,6 +134,7 @@ def preguntas():
     preguntas = {
 	    '1': insertar,
         '2': eliminar,
+        '3': modificar,
         'X': salir,
         'x': salir
     }
