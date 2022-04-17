@@ -4,7 +4,7 @@ import time
 from rich.console import Console
 from rich.table import Table
 
-nba = mysql.connector.connect(host="localhost", user="root", password="B00le", database="nba")
+nba = mysql.connector.connect(host="localhost", user="root", password="", database="nba")
 vader = nba.cursor()
 
 def borrado():
