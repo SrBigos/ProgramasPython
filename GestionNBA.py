@@ -1,6 +1,8 @@
 import mysql.connector
 import os
 import time
+from rich.console import Console
+from rich.table import Table
 
 nba = mysql.connector.connect(host="localhost", user="root", password="B00le", database="nba")
 vader = nba.cursor()
@@ -155,21 +157,57 @@ def modificar():
 # ---------------------
 
 def datos():
+    global resultado
     borrado()
     print("-----------------\nDATOS DEL JUGADOR\n-----------------\n")
     nombre = input("· Indícame el nombre del jugador que deseas ver sus datos: ")
-    vader.execute(f"SELECT * FROM jugadores WHERE Nombre LIKE '{nombre}'")
-    codigo_sql = vader.fetchall()
-    jugador = []
-    for x in codigo_sql:
-        jugador.append(x)
-    print(jugador)
+    vader.execute(f"SELECT * FROM jugadores WHERE Nombre LIKE '{nombre}%'")
+    resultado = vader.fetchall()
+    tabla(resultado)
+    
+def tabla(resultado):
+    global salimos
+    tablita = Table(title="Jugadores")
+    tablita.add_column("Código", justify="right", no_wrap=True)
+    tablita.add_column("Nombre", justify="center", style="white")
+    tablita.add_column("Procedencia", justify="center", style="white")
+    tablita.add_column("Altura", justify="center", style="white")
+    tablita.add_column("Peso", justify="center", style="white")
+    tablita.add_column("Posicion", justify="center", style="white")
+    tablita.add_column("Equipo", justify="right", style="white")
+    for x in (resultado):
+        lista = []
+        str(lista)
+        for y in x:
+            lista.append(str(y))
+        tablita.add_row(*lista)
+    consola = Console()
+    consola.print(tablita)
+    salimos = 'S'
+    while salimos != 'X':
+        salimos = input("Para salir escriba 'X'\n\nOpción: ")
+    print("Saliendo...")
+    time.sleep(2)
+    borrado()
+    preguntado()
+# ----------------------
+# 5. TODOS LOS JUGADORES
+# ----------------------
+
+def lista_jugadores():
+    global resultado
+    borrado()
+    vader.execute("SELECT * FROM jugadores")
+    resultado = vader.fetchall()
+    tabla(resultado)
+
 def preguntas(): 
     preguntas = {
 	    '1': insertar,
         '2': eliminar,
         '3': modificar,
         '4': datos,
+        '5': lista_jugadores,
         'X': salir,
         'x': salir
     }
