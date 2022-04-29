@@ -1,0 +1,66 @@
+import mysql.connector
+import os
+
+jardineria = mysql.connector.connect(host='localhost', user='root', password='B00le', database='nba')
+inazuma = jardineria.cursor()
+inazuma.execute('USE Jardineria')
+def clean():
+    os.system('cls')
+
+def preguntado():
+    global codigo
+    codigo = input("----------------------------------\nＧＥＳＴＯＲ ＪＡＲＤＩＮＥＲＩＡ\n----------------------------------\n\n· Indícame el código del pedido: ")
+    salir = True
+    clean()
+    cabezera()
+    pedidos()
+    salimos()
+
+def cabezera():
+    sql = f'SELECT CodigoCliente, FechaPedido, Estado FROM pedidos WHERE CodigoPedido = {codigo}'
+    try: 
+        inazuma.execute(sql)
+    except:
+        clean()
+        print("Me has indicado un código erroneo...\n")
+        preguntado()
+    resultado = inazuma.fetchall()
+    for codigocliente, fechapedido, estado in resultado:
+        fechita = str(fechapedido)
+        print("+{:-<15}+{:-<13}+{:-<13}+".format("", "", ""))
+        print("|{:<15}|{:<13}|{:<13}|".format(" CodigoCliente", " FechaPedido", "   Estado"))
+        print("+{:-<15}+{:-<13}+{:-<13}+".format("", "", ""))
+        print("|{:^15}|{:^13}|{:^13}|".format(codigocliente, fechita, estado))
+        print("+{:-<15}+{:-<13}+{:-<13}+".format("", "", ""))
+
+def pedidos():
+    sql = f'SELECT CodigoProducto, Cantidad, PrecioUnidad FROM detallepedidos WHERE CodigoPedido = {codigo}'
+    inazuma.execute(sql)
+    resultado = inazuma.fetchall()
+    print("\n")
+    print("+{:-<16}+{:-<10}+{:-<15}+{:-<15}+".format("", "", "", ""))
+    print("|{:<16}|{:<10}|{:15}|{:15}|".format(" CodigoProducto", " Cantidad", " Precio Unidad", "  Subtotal"))
+    print("+{:-<16}+{:-<10}+{:-<15}+{:-<15}+".format("", "", "", ""))
+    preciototal = 0
+    for codigoproducto, cantidad, preciounidad in resultado:
+        subtotal = cantidad * preciounidad
+        print("|{:^16}|{:^10}|{:^15}|{:^15}|".format(codigoproducto, cantidad, f"{preciounidad}€", f"{subtotal}€"))
+        preciototal = preciototal + subtotal
+    print("+{:-<16}+{:-<10}+{:-<15}+{:-<15}+".format("", "", "", ""))
+    try: 
+        print("|{:<16}|{:<10}|{:<15}:{:<15}|".format("","", "  Precio Total", f"   {preciototal}€"))
+        print("+{:-<16}+{:-<10}+{:-<15}+{:-<15}+".format("","", "", ""))
+    except:
+        clean()
+        print(f"· Indícame el código del pedido: {codigo}")
+        print("\nEse producto no existe...\n")
+        preguntado()
+
+def salimos():
+    global salir
+    salir = input("\nEscriba X para salir de este listado: ")
+    if salir == 'X' or salir == 'x':
+        clean()
+        preguntado()
+clean()
+preguntado()
